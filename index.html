@@ -143,7 +143,7 @@
 
     <div class="summary-box">
         <h3 style="margin-top: 0; color: #1565c0;">1. 會議摘要</h3>
-        <p>核心聚焦於 LINE Pay 第三方支付與電子支付的金流底層邏輯。從消費者「授權(Auth)」、商家「請款(Capture)」，到系統生成「撥款底稿(Settle)」並打包「結算(Aggregation)」，最終產出傳票完成撥款。重點釐清了日結、週結、月結遇上「假日」的系統排程差異（日結順延，週/月結假日照跑），以及針對不同商戶（如 7-11 統整請款、Uber 僅做資訊分潤、新光三越的 MID 邏輯）的特殊處理規則，為後續複雜的財務對帳打下堅實的觀念基礎。</p>
+        <p>核心聚焦於 LINE Pay 第三方支付與電子支付的金流底層邏輯。從消費者「授權(Auth)」、商家「請款(Capture)」，到系統生成「撥款底稿(Settle)」並打包「結算(Aggregation)」，最終產出傳票完成撥款。重點釐清了日結、週結、月結遇上「假日」的系統排程差異（日結順延，週/月結假日照跑），以及法規對於代收代付的限制，為後續複雜的財務對帳打下堅實的觀念基礎。</p>
     </div>
 
     <h2>【第一部分：核心觀念與架構】</h2>
@@ -155,7 +155,7 @@
         <li><strong>撥款底稿 (Settle)</strong>：Capture 發生後約 1 秒內，系統瞬間逐筆生成應撥款的「原始資料」。</li>
         <li><strong>結算 (Aggregation)</strong>：系統依據商家合約週期（日/週/月），將多筆 Settle 打包成「一整包」。</li>
         <li><strong>傳票 (Journal / JE)</strong>：結算完成後，系統產出對應的財務撥款傳票金額。</li>
-        <li><strong>撥款 (Settlement)</strong>：財務端核對傳票與實際銀行金流無誤後，將資金撥付至商家帳戶。<em>(註：Payout 通常是指商店跟用戶之間的金流英文，撥款給商家通用語為 Settlement)</em>。</li>
+        <li><strong>撥款給商家 (Settlement)</strong>：財務端核對傳票與實際銀行金流無誤後，將資金撥付至商家帳戶。<em>(註：Payout 比較是商店跟用戶之間會用的英文，撥款給商家通用語為 Settlement)</em>。</li>
     </ol>
 
     <h3>3. 金句與雷區 (Tips & Red Zones)</h3>
@@ -171,8 +171,8 @@
                 如果商戶是 W111（週一結算，週二撥款），但週二是國定假日，這筆錢<strong>絕對不會在週二出去</strong>，系統會自動順延到週三（下一個工作日）撥款。
             </li>
             <li><strong>搞混「代收代付」的法規限制：</strong><br>
-                第三方支付原則上不能做代收代付業者與代收代付業者的介接。但<strong>電子支付</strong>法規有開後門，允許「外送平台」與「計程車」這兩種特例進行代收代付介接。<br>
-                因此，若不能幫純外送平台（如 Uber、FoodPanda）做全額代收代付，對 Uber 我們僅做「資訊串接與分潤抽成」，不碰本金；但如果是 Momo（買貨進來再賣出去的實質買賣），我們就可以完整代收代付。
+                <strong>第三方支付不能做</strong>代收代付業者跟代收代付業者的介接。但是<strong>電子支付可以做</strong>，法規有開一個後門，給「外送平台」還有「計程車」，可以代收代付業者跟代收代付業者接，僅限這兩個。<br>
+                因此，我們不能幫純外送平台（如 Uber、FoodPanda）做全額代收代付。對 Uber 我們僅做「資訊串接與分潤抽成」，不碰本金；但如果是 Momo（買貨進來再賣出去的實質買賣），我們就可以完整代收代付。
             </li>
         </ol>
     </div>
@@ -180,7 +180,7 @@
     <h3>4. 我的待辦事項</h3>
     <ul>
         <li><span class="tag tag-high">高優先</span> 熟記並實際操作「每日結算統計報表 SOP (12 步驟)」。 </li>
-        <li><span class="tag tag-med">中等</span> 閱讀內部 LP 維基百科，查詢各類結算週期 (W110, A1 等) 的<strong>邏輯</strong>。 </li>
+        <li><span class="tag tag-med">中等</span> 閱讀內部 LP 維基百科，查詢各類結算週期 (W110, A1 等) 的<strong>邏輯</strong>。（注意：不是歷史帳單）。 </li>
     </ul>
 
     <h3>5. 專有名詞小字典</h3>
@@ -189,7 +189,7 @@
         <tbody>
             <tr><td><strong>第三/電子支付差異</strong></td><td>
                 <strong>第三方支付 (TSP)</strong>：只有信用卡支付。需串接收單行(玉山/台新等五大行)，錢從銀行來。<br>
-                <strong>電子支付</strong>：區分成用信用卡支付（有收單）或用儲值金支付（無收單，直接扣款）。<br>
+                <strong>電子支付</strong>：區分成「用信用卡支付」或「用儲值金支付」。如果用信用卡支付就有收單；用儲值金就沒有收單，直接扣款。<br>
                 <span class="note-highlight">★ 系統判定邏輯：</span>消費時，若商家與用戶雙方皆有申請電子支付，系統即走電子支付；若有一端未申請，就會走 TSP (第三方支付)。
             </td></tr>
             <tr><td><strong>Auto / Manual Capture</strong></td><td><strong>Auto</strong>：授權後立刻請款。<strong>Manual</strong>：非即時請款。例如：<strong>7-11</strong> 交易量太大一天包成一包請款；<strong>NET</strong> 每 4 小時請款一次；<strong>Uber</strong> 等餐點送達後才請款。</td></tr>
@@ -203,7 +203,7 @@
     <h3>6. 各步驟預估時間與難度</h3>
     <ul>
         <li>理解底層金流架構 (Auth/Capture/Settle)：<span class="tag tag-low">★ 簡單</span>（理解邏輯即可）</li>
-        <li>辨識特殊商戶請款與分潤邏輯 (Uber / Momo / 7-11)：<span class="tag tag-med">★★ 中等</span>（需記憶特例）</li>
+        <li>辨識特殊報表處理：日常作業日結與週結無特殊模板差異，但需留意 <strong>after-charge 商店 (如 7-11)</strong> 與 <strong>僅分潤商店 (如 Uber)</strong> 的特殊報表。<span class="tag tag-med">★★ 中等</span></li>
         <li>掌握結算週期與假日順延機制 (A1 / W110)：<span class="tag tag-high">★★★ 需要練習</span>（需拿著月曆推演連假狀況）</li>
         <li>執行每日結算報表與抓帳 (下方 12 步驟)：<span class="tag tag-high">★★★ 需要練習</span>（Excel 步驟極多，需高度專注力）</li>
     </ul>
@@ -211,7 +211,7 @@
     <div class="review-card">
         <h3 style="margin-top: 0; color: #1b5e20; border: none;">🚀 7. 一頁版快速複習卡 (濃縮精華)</h3>
         <p><strong>🔹 核心對帳公式：</strong><br>
-        <span class="code-text">Capture (請款)</span> ＝ <span class="code-text">Settle (撥款底稿)</span> ＝ <span class="code-text">Aggregation (結算)</span> ＝ <span class="code-text">Journal/JE (傳票)</span> ＝ <span class="code-text">銀行實際撥款 (Settlement)</span></p>
+        <span class="code-text">Capture (請款)</span> ＝ <span class="code-text">Settle (撥款底稿)</span> ＝ <span class="code-text">Aggregation (結算)</span> ＝ <span class="code-text">Journal / JE (傳票)</span> ＝ <span class="code-text">銀行實際撥款 (Settlement)</span></p>
         
         <p><strong>🔹 假日生存法則：</strong><br>
         【結算日】：日結遇紅字順延；週/月結遇紅字<strong>照樣結算</strong>。<br>
