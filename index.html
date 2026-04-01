@@ -179,7 +179,7 @@
 
     <h3>4. 我的待辦事項</h3>
     <ul>
-        <li><span class="tag tag-high">高優先</span> 熟記並實際操作「每日結算統計報表 SOP (12 步驟)」。 </li>
+        <li><span class="tag tag-high">高優先</span> 熟記並實際操作「每日結算統計報表 SOP」。 </li>
         <li><span class="tag tag-med">中等</span> 閱讀內部 LP 維基百科，查詢各類結算週期 (W110, A1 等) 的<strong>邏輯</strong>。（注意：不是歷史帳單）。 </li>
     </ul>
 
@@ -200,16 +200,8 @@
         </tbody>
     </table>
 
-    <h3>6. 各步驟預估時間與難度</h3>
-    <ul>
-        <li>理解底層金流架構 (Auth/Capture/Settle)：<span class="tag tag-low">★ 簡單</span>（理解邏輯即可）</li>
-        <li>辨識特殊報表處理：日常作業日結與週結無特殊模板差異，但需留意 <strong>after-charge 商店 (如 7-11)</strong> 與 <strong>僅分潤商店 (如 Uber)</strong> 的特殊報表。<span class="tag tag-med">★★ 中等</span></li>
-        <li>掌握結算週期與假日順延機制 (A1 / W110)：<span class="tag tag-high">★★★ 需要練習</span>（需拿著月曆推演連假狀況）</li>
-        <li>執行每日結算報表與抓帳 (下方 12 步驟)：<span class="tag tag-high">★★★ 需要練習</span>（Excel 步驟極多，需高度專注力）</li>
-    </ul>
-
     <div class="review-card">
-        <h3 style="margin-top: 0; color: #1b5e20; border: none;">🚀 7. 一頁版快速複習卡 (濃縮精華)</h3>
+        <h3 style="margin-top: 0; color: #1b5e20; border: none;">🚀 6. 一頁版快速複習卡 (濃縮精華)</h3>
         <p><strong>🔹 核心對帳公式：</strong><br>
         <span class="code-text">Capture (請款)</span> ＝ <span class="code-text">Settle (撥款底稿)</span> ＝ <span class="code-text">Aggregation (結算)</span> ＝ <span class="code-text">Journal / JE (傳票)</span> ＝ <span class="code-text">銀行實際撥款 (Settlement)</span></p>
         
@@ -223,20 +215,26 @@
     <hr style="border: 0; border-top: 2px dashed #eee; margin: 40px 0;">
 
     <h2>【第二部分：每日結算統計報表 SOP (實戰操作)】</h2>
-    <p>前情提要：假設今天為 <strong>02/27</strong>，要做今天的結算統計報表。操作分為「下載三份原始檔」與「整合至當天撥款報表模板」兩大階段。</p>
+    <p>前情提要：假設今天為 <strong>02/27</strong>，要做今天的結算統計報表。操作分為「下載原始檔」、「清除舊資料」與「整合至當天撥款報表模板」三大階段。</p>
 
     <h3>一、 下載三份來源檔案 (Raw Data)</h3>
-    <p>將以下三份從 LINE Pay 內部系統下載的 Excel 檔案置於同一個路徑中：</p>
+    <div class="warning-box">
+        <strong>📥 檔案下載與統整原則：</strong><br>
+        • 統整用的總檔案，通常會用上週一的作為參考來源，因為資料比較完整（會包含週結資料進來），例如：<code>LINE Pay EPI_Settlement Report_20260331</code>。<br>
+        • 從系統下載後的檔名日期可能變動，但開頭英文字不變。<br>
+        • <strong>Bulk Download 的共通路徑為：</strong> <code>Admin Function > Bulk Data Download</code> 尋找生成的檔案。
+    </div>
     
     <div class="action-box">
         <strong>1. 下載傳票 (Search for Merchant Settlement)</strong>
         <ul>
+            <li><strong>下載檔名開頭：</strong> <code>MERCHANT_SETL_AGRN_BASE_...</code></li>
             <li><strong>路徑：</strong><code>Admin Function > Settlement Confirm > Search for Merchant Settlement</code></li>
             <li><strong>搜尋條件：</strong>
                 <br>• Aggregation date: 選擇當天日期 <span class="code-text">02/27</span>
                 <br>• Scheduled Settlement date: 選擇範圍為 <span class="code-text">當天 02/27 - 往後兩個月 (例如 04/30)</span> (主要是要把最久的 A25 情況包含進來)
             </li>
-            <li><strong>操作：</strong>按下 Search 生成結果後，點選 Download 下載結算傳票 Excel。</li>
+            <li><strong>操作：</strong>按下 Search 生成結果後，點選 Bulk Download，<strong>並勾選 Delete previous aggregated file</strong>，再點選生成按鈕，以下載結算傳票 Excel。</li>
         </ul>
     </div>
 
@@ -244,93 +242,104 @@
         <strong>2. 商家統計數據 (Merchant Statistics)</strong>
         <ul>
             <li><strong>用途：</strong>抓取每個商家的統計數據，比對請款與撥款是否一致。</li>
+            <li><strong>下載檔名開頭：</strong> <code>MERCHANT_SETL_STATS_...</code></li>
             <li><strong>路徑：</strong><code>Settlement > Settlement Statistics > Merchant Statistics</code></li>
-            <li><strong>搜尋條件 (交易日)：</strong>搜尋前一天 (例如 02/26)。<br>
+            <li><strong>搜尋條件 (交易日)：</strong>搜尋前一天 (例如 <span class="code-text">02/26-02/26</span>)。<br>
                 <span style="color: #e74c3c; font-weight: bold;">★ 特殊規則：</span>如果前一天是假日，則要包含前一個最後一個工作日，以及中間包含的所有假日 (例：今天是週一，則選擇上週五~週日的日期範圍)。
             </li>
-            <li><strong>操作：</strong>點擊黃色的 <code>Bulk download</code> 鈕。在跳出的 dialog 選擇日期範圍，<strong>必須勾選 <code>Delete previous Aggregation file</code></strong>。點選下載後，算是非同步下載，須至 Admin 下的 <code>Bulk Data download</code> 清單等待寫入完成並顯示下載按鈕。</li>
+            <li><strong>操作：</strong>點擊黃色的 <code>Bulk download</code> 鈕。在跳出的 dialog 選擇日期範圍，<strong>必須勾選 <code>Delete previous Aggregation file</code></strong>。非同步下載，須至 <code>Bulk Data download</code> 等待寫入完成下載。</li>
         </ul>
     </div>
 
     <div class="action-box">
         <strong>3. 逐筆撥款明細統計 (Statistics for validation)</strong>
         <ul>
+            <li><strong>下載檔名開頭：</strong> <code>MERCHANT_SETL_VALID_AGRN_...</code></li>
             <li><strong>路徑：</strong><code>Settlement > Settlement Statistics > Statistics for validation</code></li>
             <li><strong>搜尋條件 (日期範圍)：</strong>選擇結算日當天 <span class="code-text">02/27</span>。</li>
             <li><strong>操作：</strong>同樣點擊黃色的 <code>Bulk download</code> 鈕，選擇日期範圍並<strong>勾選 <code>Delete previous Aggregation file</code></strong>。至 <code>Bulk Data download</code> 清單等待下載完成。</li>
         </ul>
     </div>
 
-    <h3>二、 整合至「當天的撥款報表」Excel</h3>
-    <p>以下操作皆在既有的模板「當天的撥款報表」中執行（已內建完整分頁名稱、表頭與樞紐分析表 Pivot）。</p>
+    <h3>二、 清除舊資料前置作業</h3>
+    <p>先把「當天的撥款報表」(例如：<code>LINE Pay EPI_Settlement Report_20260331</code>) 這個檔案進行部分清除動作，主要是清除原有的來源資料，不動樞紐的分頁以及公式欄位。刪除的分頁以及內容如下：</p>
+    <ul>
+        <li><strong>Mercant Settle Statistics</strong>：刪除 Column A~P, <strong>但保留 Column M</strong> (標頭為 "Verify"，此 column 為公式)。</li>
+        <li><strong>APAR</strong>：刪除 Column A~AG。</li>
+        <li><strong>Refund Reserve</strong>：刪除 Column A~AF。</li>
+        <li><strong>Finance IF (Admin JE)</strong>：刪除 Column A~AF。</li>
+        <li><strong>Settlement Statistics</strong>：刪除 Column A~M。</li>
+        <li><strong>Report</strong>：刪除圖片 (從 Rounding off 截圖過來的樞紐統計表)。</li>
+        <li><strong>statistics_LP& External Account</strong>：刪除 Column A~G，<strong>從 row 3 開始刪除</strong> (row 2 是表頭不能刪)。</li>
+    </ul>
+
+    <h3>三、 整合至「當天的撥款報表」Excel</h3>
+    <p>以下操作皆在剛清除好舊資料的「當天的撥款報表」模板中執行。</p>
 
     <h4>Step 1. 處理「逐筆撥款明細」 (排除後結手續費)</h4>
     <ol>
-        <li>打開【檔案 3：逐筆撥款明細】檔案，把 <code>Sheet1</code> 全部的值貼到模板的分頁 <code>Settlement Statistics</code> 中（連表頭都一樣不變）。</li>
+        <li>打開檔案 3 <code>MERCHANT_SETL_VALID_AGRN</code>，把 Sheet1 全部的值貼到模板的分頁 <code>Settlement Statistics</code> 中（連表頭都一樣不變）。</li>
         <li>將 Column <code>Fee Charge Method</code> 篩選出值為 <span class="code-text">Payable</span>。</li>
         <li>接著把 <code>Service Fee</code> 跟 <code>VAT</code> 這兩個 Column 篩選出來的每個 rows 的金額<strong>都刪除</strong>（因為這算是手續費後結，不放進現在的資料表內）。</li>
     </ol>
 
     <h4>Step 2. 處理「結算傳票」(篩選 AP 應付與整理格式)</h4>
     <ol>
-        <li>打開【檔案 1：結算傳票】Excel 進行資料篩選：
-            <ul>
-                <li>篩選表頭 <code>NEON Fees Field</code> 欄位：篩選出包含 <span class="code-text">Fee</span> 字串（代表 AP-應付），<strong>不勾選空白的選項</strong>。</li>
-                <li>篩選表頭 <code>Transferred(Y/N)</code> 欄位：選擇 <span class="code-text">Y</span>（代表已傳送至 NEON 系統，應付為正數）。</li>
-                <li>篩選表頭 <code>I/F Code</code> 欄位：僅挑出 <span class="code-text">LPTW_EPI_Payment</span> 及 <span class="code-text">LPTW_EPI_Payment_Aft</span>，只選這兩個，其他不選。</li>
-            </ul>
+        <li>打開檔案 1 <code>MERCHANT_SETL_AGRN_BASE</code> 進行資料篩選：
+            <br>• 篩選表頭 <code>NEON Fees Field</code> 欄位：篩選出包含 <span class="code-text">Fee</span> 字串（代表 AP-應付），<strong>不勾選空白的選項</strong>。
+            <br>• 篩選表頭 <code>Transferred(Y/N)</code> 欄位：選擇 <span class="code-text">Y</span>（代表已傳送至 NEON 系統，應付為正數）。
+            <br>• 篩選表頭 <code>I/F Code</code> 欄位：僅挑出 <span class="code-text">LPTW_EPI_Payment</span> 及 <span class="code-text">LPTW_EPI_Payment_Aft</span>，只選這兩個，其他不選。
         </li>
         <li>將這個表格的全部篩選結果，貼到模板的分頁 <code>Finance IF (Admin JE)</code>。</li>
-        <li>貼上後，再次在該分頁篩選表頭 <code>I/F code</code> 為 <span class="code-text">LPTW_EPI_Payment_Aft</span>，接著把 <code>Service Fee</code> 跟 <code>VAT</code> 這兩個 Column 的每個 rows 金額都刪除（同樣為手續費後結）。</li>
-        <li>將 Column 表頭 <code>Actual Deposit Amount</code> 的每個 rows 的值改為<strong>數字格式</strong>（貼過來時會是文字格式，每個欄位左上角會有綠色三角形，需轉換）。</li>
+        <li>貼上後，再次在該分頁篩選表頭 <code>I/F code</code> 為 <span class="code-text">LPTW_EPI_Payment_Aft</span>。接著把標頭為 <code>Service Fee</code> & <code>VAT(Service Fee)</code> (對應 Column O & P) 這兩個 Column 的每個 rows 金額都刪除（同樣為手續費後結）。</li>
     </ol>
 
     <h4>Step 3. 處理「退款準備金 (Refund Reserve)」</h4>
     <ol>
-        <li>回到剛才【檔案 1：結算傳票】已經篩選好的狀態，更改表頭 <code>I/F Code</code> 欄位的篩選，改為只包含 <span class="code-text">Refund Reserve</span>（只選這個）。</li>
+        <li>回到剛才已經篩選好的 <code>MERCHANT_SETL_AGRN_BASE</code> 檔案，更改表頭 <code>I/F Code</code> 欄位的篩選，改為只包含 <span class="code-text">Refund Reserve</span>（只選這個）。</li>
         <li>將篩選結果貼到模板分頁 <code>Refund Reserve</code>。</li>
     </ol>
 
     <h4>Step 4. 排除 Refund Reserve 對當天總撥款的影響</h4>
     <ol>
         <li>分頁 <code>Finance IF (Admin JE)</code> 是當天整天要撥款的金額，因此必須將 Refund Reserve 剔除。</li>
-        <li>將 <code>Refund Reserve</code> 分頁中的「商家名稱」，逐筆去對應 <code>Settlement Statistics</code> 檔案 Sheet1 中的「商家名稱」。（因每小時統計，商家篩選後可能有多筆）。</li>
-        <li><strong>核對總和條件：</strong>
-            <br>• 根據欄位名稱 <code>Base Amt. for settle</code> 核對，兩邊的總和金額必須一致。
-            <br>• 且 <code>Scheduled settelement Date</code> 必須與 Refund Reserve 分頁一致。
+        <li>在 <code>Settlement Statistics</code> 分頁中，找出 Column D (Merchant) 是否有出現在 <code>Refund Reserve</code> 分頁的 Column E (Merchant ID) 中（可用公式找出，名稱須完全一致）。</li>
+        <li><strong>核對總和條件（計算兩邊的對應加總）：</strong><br>
+            • <strong>第一邊 (Settlement Statistics)：</strong>Col C <code>Scheduled Settlement Date</code> (格式如 2026-04-01)、Col D <code>Merchant</code>、Col F <code>Base Amt. for settle</code>。<br>
+            👉 將相同的 Merchant 且對應的 Scheduled Settlement Date 進行 <code>Base Amt. for settle</code> 加總。<br>
+            • <strong>第二邊 (Refund Reserve)：</strong>Col B <code>Scheduled Settlement Date</code> (格式如 20260401，可先轉為 2026-04-01 方便核對)、Col D <code>Merchant ID</code>、Col N <code>Base Amt. for settle</code>。<br>
+            👉 核對此表中的 Merchant ID 對應日期的 <code>Base Amt. for settle</code>，是否與上述第一邊的總和「完全相符」。
         </li>
-        <li>如果總和數字確認一致，則**刪除 <code>Settlement Statistics</code> 對應的 rows**（刪除包含了 Refund Reserve、不應存在於當天要撥款金額的列）。</li>
+        <li>如果完全相符，則<strong>刪除分頁 <code>Settlement Statistics</code> 對應的 rows</strong>（也就是該 row 資料有存在於 Refund Reserve，就不應存在於 Settlement Statistics）。</li>
     </ol>
 
     <h4>Step 5. 建立 AP/AR 總表 (搬移欄位)</h4>
     <ol>
-        <li>繼續使用【檔案 1：結算傳票】（<strong>清除所有篩選</strong>）。</li>
+        <li>繼續使用 <code>MERCHANT_SETL_AGRN_BASE</code>（<strong>清除所有篩選</strong>）。</li>
         <li>將傳票檔案 Column A~M 每個 row 的數據貼到模板分頁 <code>APAR</code> 的 <strong>Column A~M</strong> 中。</li>
-        <li>將傳票檔案 Column N~AE 貼到模板分頁 <code>APAR</code> 的 <strong>Column O~AF</strong> 中。<br>
-            <span class="note-highlight">主要差異：</span>模板 APAR 的 Column N 是另外建立的（不存在於傳票），所以從 Column O 開始貼，並將 Column O 表頭改名為 <span class="code-text">AP</span>（應付）。
+        <li>將傳票檔案 Column N~AF 貼到模板分頁 <code>APAR</code> 的 <strong>Column O~AG</strong> 中。<br>
+            <span class="note-highlight">主要差異：</span>模板 APAR 的 Column N (AR) 是另外建立的（不存在於傳票），所以從 Column O 開始貼，並將 Column O 表頭改名為 <span class="code-text">AP</span>（應付）。
         </li>
-        <li>貼完後，透過 Column H 標頭 <code>I/F Code</code> 進行篩選，<strong>僅保留</strong>以下四個，其他的 rows 直接刪除：<br>
+        <li>貼完後，透過 <strong>Column G</strong> 標頭 <code>I/F Code</code> 進行篩選，<strong>僅保留</strong>以下四個，其他的 rows 直接刪除：<br>
             <span class="code-text">LPTW_EPI_Payment</span>、<span class="code-text">LPTW_EPI_Payment_Aft</span>、<span class="code-text">LPTW_EPI_Settle_Bal</span>、<span class="code-text">LPTW_EPI_Settle_Cc</span>
         </li>
         <li>排序 Column AB 標頭 <code>NEON Fees Field</code>（由小到大）。</li>
-        <li>去篩選挑出「空格」的 rows（代表 AR 應收），有值的代表 AP（應付）。</li>
-        <li>將 Column O（AP）的值，<strong>搬移</strong>到 Column N（AR）。</li>
+        <li>去篩選 Column AB 標頭 <code>NEON Fees Field</code>，挑出「空格」的 rows（代表 AR 應收），有值的代表 AP（應付）。</li>
+        <li>將 Column O（AP）的值，<strong>搬移</strong>到 Column N（AR）（也可將 AP 先複製到 AR 後，再刪除 AP 原有資料）。</li>
     </ol>
-    <div class="warning-box">
-        <strong>⚠️ 待確認事項：</strong>確認模板 <code>APAR</code> 分頁中，這個「另外建立的 Column N」的正式表頭名稱是否就是 "AR"？
-    </div>
 
     <h4>Step 6. 驗證 Method 樞紐</h4>
     <ol>
-        <li>包含 <code>method 1</code>、<code>method 2</code>、<code>method 3</code> 三個分頁。</li>
-        <li>分別將該分頁中的樞紐統計表「重新整理」。</li>
+        <li>包含 <code>method 1</code>、<code>method 2</code>、<code>method 3</code> 三個分頁。分別將該分頁中的樞紐統計表「重新整理」。</li>
         <li>把數值接到右邊空白處去（三個分頁中已經有指定的貼上位置，最後一個 column 帶有比對公式）。</li>
-        <li>進行結果比對，公式結果如果是 <strong>0（無差異）</strong>代表正確。</li>
+        <li>進行結果比對，公式結果如果是 <strong>0（無差異）</strong>代表正確。<br>
+            <span class="note-highlight">補充說明：</span>分頁 method 2 與 method 3 中，<code>LPTW_EPI_Payment</code> 及 <code>LPTW_EPI_Payment_Aft</code> 代表 AP (同一個 row 只會有一個 cell 有值)；<code>LPTW_EPI_Settle_Bal</code> 及 <code>LPTW_EPI_Settle_Cc</code> 代表 AR。每個 row 的 AP 總和必須等於 AR 總和。公式會用其中一個 column 作為代表，可能要手動調整。
+        </li>
     </ol>
 
     <h4>Step 7. 匯入商家統計數據</h4>
     <ol>
-        <li>打開【檔案 2：Merchant Statistics】，將 Sheet1 從 Column A~L 的所有 rows 複製，貼到模板分頁 <code>Mercant Settle Statistics</code> 的 <strong>Column A~L</strong>。</li>
+        <li>打開檔案 2 <code>MERCHANT_SETL_STATS</code>，將 Sheet1 從 Column A~L 的所有 rows 複製，貼到模板分頁 <code>Mercant Settle Statistics</code> 的 <strong>Column A~L</strong>。</li>
         <li>將 Sheet1 從 Column M~O 複製，貼到模板的 <strong>Column N~P</strong>。</li>
         <li>因為模板的 Column M 增加了一個名為 <code>verfiy</code> 的欄位（自帶公式），貼上後必須將 Column M 每個 rows 都下拉套用到公式。</li>
     </ol>
@@ -345,7 +354,9 @@
             • 對應 LINE_POINT 填入：<span class="code-text">LP Account-LINE Points</span>
         </li>
         <li>到模板分頁 <code>LP& External Account Verify</code> 更新樞紐來源，結果貼到右方（已有指定位置），下拉最右邊 verify 公式檢查請款與撥款是否一致。</li>
-        <li><strong>篩選出非 "0" 的情況</strong>（非 0 代表有問題，要找出原因）。</li>
+        <li><strong>篩選出非 "0" 的情況</strong>查明原因。<br>
+            <span class="note-highlight">補充說明：</span>標籤列如果是 AG 開頭的代表是代理商群組名稱，不會有 Captured 的值，所以 Verify 計算出來不是 0 的情況是正常的。
+        </li>
     </ol>
 
     <h4>Step 9. 核對信用卡 (CREDIT_CARD)</h4>
@@ -354,33 +365,39 @@
         <li>找出標籤列 <span class="code-text">CREDIT_CARD</span> 的明細，將對應的 Column A~F 貼到分頁 <code>statistics credit Verify</code> 的 Column A~F。</li>
         <li>將已存在的 Column G <code>verify</code> 公式下拉做檢核，篩選出非 "0" 的情況並查明原因。</li>
     </ol>
+    <div class="action-box">
+        <strong>🔍 異常查明方式 (以 PChomeEC 為例)：</strong>
+        <p style="margin: 5px 0 0 0;">
+            1. 進入路徑：<code>Settlement > Merchant Settlement data > Merchant settlement raw data</code>。<br>
+            2. Period 選擇 Scheduled Aggregates Date 並選擇結算當天日期，Merchant ID 填上 <code>PChomeEC</code>，Search 後 Download。<br>
+            3. 打開 Excel，將 Payment method 篩選取出 <code>CREDIT_CARD</code> 的 rows。<br>
+            4. 確認 Column <code>Base Amt. for settle</code> 總和是否與原本檔案中 Column <code>加總 - Base Amt. for settle</code> 相符。若相符則無異常（但需向韓國方回報此問題）。
+        </p>
+    </div>
 
     <h4>Step 10. PV All 與小數點四捨五入處理</h4>
     <ol>
         <li>到分頁 <code>PV All</code> 更新總共兩個樞紐統計表的來源資料。</li>
-        <li>將名為 <code>Finace I/F</code> 的樞紐結果複製，貼到分頁 <code>Rounding off</code> 的 <strong>Column Q</strong> 開始貼（覆蓋之前的表格）。</li>
+        <li>將名為 <code>Finace I/F</code> 的樞紐結果複製（在右方的樞紐，<strong>將樞紐統計表根據標籤列中的日期收合，再貼過去</strong>），貼到分頁 <code>Rounding off</code> 的 <strong>Column Q</strong> 開始貼（覆蓋之前的表格）。</li>
         <li>到 <code>Rounding off</code> 分頁的 Column Y，更新樞紐統計表 <code>Refund reserve</code>。</li>
-        <li>回到 <code>PV All</code> 分頁，將 <code>Settle</code> 樞紐貼到 <code>Rounding off</code> 的 <strong>Column A</strong> 覆蓋。<br>
+        <li>回到 <code>PV All</code> 分頁，將 <code>Settle</code> 樞紐貼到 <code>Rounding off</code> 的 <strong>Column A</strong> 覆蓋。（從 title 標籤列下方的日期開始貼，展開不要收合）。<br>
             <span style="color: #e74c3c; font-weight: bold;">(★ 去除小數點操作：將 Settle 樞紐資料複製 -> 貼到記事本 -> 從記事本貼回樞紐統計表覆蓋，實現四捨五入)</span>
         </li>
-        <li>從 Settle 樞紐作篩選加總日期，將每個 Column B~E 透過公式 <code>SUM</code> 重算總和。<br>
+        <li>接著將標籤列進行篩選出日期以及總計 (勾選新增目前的範圍進篩選)，並將 column B rows 重新進行加總，以實際 index 範圍為主，接著公式套用到 column C & column D。<br>
             • 例如：第一個 SUM row 7~95、第二個 SUM row 96~20076...以此類推。
         </li>
-        <li>將欄位 E5 公式改為 <code>=B5-C5-D5</code>；Column B5~D5 改為剛才套用 SUM 結果的加總（例如 <code>=B6+B96+B20076</code>，根據實際 row index 為主）。</li>
+        <li>最後再更新上總計：將欄位 E5 公式改為 <code>=B5-C5-D5</code>；Column B5~D5 改為剛才套用 SUM 結果的加總（例如 <code>=B6+B96+B20076</code>，根據實際 row index 為主）。</li>
         <li><strong>截圖記錄</strong>每個日期總和對應的 row index 備用。</li>
-        <li>到模板的【待確認分頁】中的 <strong>Column H</strong>，依據每個撥款日期（參考 Col Q 標籤列上的日期），更新總共 5 個 table 的公式：<br>
+        <li>到模板的 <code>Rounding off</code> 分頁中的 <strong>Column H</strong>，依據每個撥款日期（參考 Col Q 標籤列上的日期），更新總共 5 個 table 的公式：<br>
             • 第 1 個 table：row 7~9 公式分別更新為 B6/C6/D6 (舉例)<br>
             • 第 2 個 table：row 17~19 公式分別更新為 B96/C96/D96 (舉例)<br>
             • 依此類推更新完 5 個 table。
         </li>
     </ol>
-    <div class="warning-box">
-        <strong>⚠️ 待確認事項：</strong>上述步驟「更新 當天的撥款報表 分頁 (未記錄) 的 column H」，該分頁的確切名稱是什麼？
-    </div>
 
     <h4>Step 11. 產出報告截圖</h4>
     <ul>
-        <li>最後將統計出來的統計結果（有綠底色的）截圖，貼到模板分頁 <code>Report</code> 內，這也是最後要拿來做回報的結果。</li>
+        <li>最後將統計出來的統計結果（有綠底色的）截圖，貼到模板分頁 <code>Report</code> 內，這也是最後要拿來做回報的結果。<strong>記得更新回報日期。</strong></li>
     </ul>
 
     <h4>Step 12. 異常排錯機制 (抓帳)</h4>
@@ -389,6 +406,82 @@
         <li><strong>路徑：</strong><code>Settlement > merchent settlement data > merchent settlement row data</code></li>
         <li>選擇結帳日當天 (02/27) 以及有差異的 MID (商家名稱) 去搜尋，下載明細查看 row data 結果是否與傳票相符，相符即為正確。</li>
     </ul>
+
+    <h4>Step 13. 歸檔與發信通知</h4>
+    <ul>
+        <li>最後將 EXCEL 歸檔 (每天歸檔)，接著將「當天的撥款報表」Excel 發到 email (用之前郵件回覆)。</li>
+        <li><span class="tag tag-high">注意</span> 記得要 Title 日期更新，內文的金額更新，內文也要放上統計結果（有綠底色的）截圖。</li>
+    </ul>
+    <div class="code-text" style="display: inline-block; padding: 10px; margin-top: 5px;">
+        To: TW Pay EPI Finance &lt;dl_twpayepifin@linecorp.com&gt;<br>
+        Cc: EPI Billing &lt;dl_twepibilling@linecorp.com&gt;<br>
+        Subject: [LPEPI] [Billing] Report of merchant settlement_yyyy.mm.dd
+    </div>
+
+    <hr style="border: 0; border-top: 2px dashed #eee; margin: 40px 0;">
+
+    <h2>【第三部分：實際撥款與傳票操作流程】</h2>
+
+    <h3>1. 下載並確認結算核准名單</h3>
+    <ol>
+        <li>進入路徑：<code>Administrator Function > Settlement Confirm > Approval of merchant settlement</code></li>
+        <li><strong>搜尋條件：</strong>
+            <br>• Scheduled Settlement Date：選擇結算日到往後兩個月 (例如 03/31 到 05/31)
+            <br>• Aggregation Date：選擇結算當天 (03/31)
+        </li>
+        <li>點選 Search 後，點選 Bulk Download 按鈕。接著去 <code>Bulk Data Download</code> 下載 Excel，檔名開頭會是 <code>MERCHANT_SETL_AGRN_BASE_...</code>。</li>
+        <li>打開檔案後進行篩選核對：
+            <br>① <code>NEON Fees Field</code> 非空白 (勾選有值)
+            <br>② <code>Transferred(Y/N)</code> 選擇 <span class="code-text">Y</span>
+            <br>③ <code>I/F Code</code> 選擇 <span class="code-text">LPTW_EPI_Payment</span> 以及 <span class="code-text">LPTW_EPI_Payment_Aft</span>
+        </li>
+        <li>加總 <code>Actual Deposit Amount</code>，並核對總和值是否等同於剛才統計出來的統計結果（有綠底色的）。</li>
+        <li>確認無誤後，回到 <code>Approval of merchant settlement</code> 的 <strong>Approve merchant settlement</strong>，按下紅色邊框的 OK。（需等 30 分到一小時）</li>
+    </ol>
+
+    <h3>2. 驗證傳輸是否成功</h3>
+    <ol>
+        <li>到 <code>Approval of Merchant settlement Aggregation menu</code>，先用 Search 確認下方傳票都已傳送差不多 (剩下 AG 開頭的 MID)。</li>
+        <li>再下載檔案去檢視確認 <code>Transferred (Y/N)</code> 欄位都只剩下 N，代表傳送完畢。</li>
+        <li><strong>如果有傳輸失敗 (驗證錯誤方式)：</strong>
+            <br>• 到 <code>Settlement > Finance I/F</code> 搜尋結算日當天 Period 以及 <code>Sent Status</code> 為 Fail 的情況，可看到失敗原因。
+            <br>• 常見問題是少了 vendor code/vendor ID。我們用統編去跟財務換，然後設定上系統。
+            <br>• 先到 <code>Merchant Management > Basic information > Merchant inquiry</code> 透過 MID 查統編。
+            <br>• 接著到 <code>Settlement > Merchant Settlement data > Merchant Vendor ID I/F</code> 進行 Edit 設定（預設為 Success）。
+        </li>
+    </ol>
+
+    <h3>3. 填入撥款報表與傳票拋轉設定</h3>
+    <ol>
+        <li>依照當天的 Merchant Settlement Report，將對應撥款日的金額及週期，填入 <code>Transfer Summary List_yyyymm</code> 檔案中（A1、A2 等等的金額貼到對應日期）。</li>
+        <li>傳票都送到財務後 15 分鐘再處理，也就是 Approve merchant settlement 按下紅色邊框的 OK 之後。</li>
+        <li>到 <code>Administrator Function > Settlement Confirm > Transfer approval</code>。</li>
+        <li>下拉到 Transfer Request List，<code>Scheduled Settlement Date</code> 選擇撥款日 (當日)，點選 Bulk Download。</li>
+        <li>下載檔名開頭為 <code>MERCHANT_SETL_PAY_REQ_SCHDL_...</code>。打開後先檢查資料是否完整：
+            <br>👉 欄位 <code>Actual Transfer Amount</code> 的總和是否等於今天要撥款的總和 (透過剛整理好的 <code>Transfer Summary List_yyyymm</code> 查看)。
+        </li>
+    </ol>
+
+    <h3>4. 銀行名單設定與排除機制</h3>
+    <ol>
+        <li>如果總和一致，接著篩選出 <code>COOPERATIVE_BANK</code> 並檢查銀行名稱是否有包含「台新國際商業銀行」或「合作金庫商業銀行」。
+            <br>• 如果有，要把這些 MID 複製出來到 txt 中。這兩家銀行非合作銀行，需批量設定為 <code>FISC-Exception</code> (非合作銀行的撥款方式)。
+            <br>• <strong>修改路徑：</strong>到 <code>Operation Menu > Settlement Master Data > Settlement Banking Setup</code> 點選 <strong>Register(Bulk)</strong>，Settlement Banking System 選擇 <code>FISC-Exception</code> 以及對應的 txt 文件上傳。
+        </li>
+        <li>接著篩選出 <code>NON_COOPERATIVE_BANK</code> (非合作銀行) 並檢查 <code>Actual Transfer Amount</code> 是否有超過 200 萬。如果有，要挑出 MID 並至 <strong>Register(Each)</strong> 進行設定：
+            <br>① 先進行 MID 搜尋，並點選 Close 關閉。
+            <br>② 點擊按鈕 <strong>Register(Each)</strong> 填上 MID 並選擇 <span class="code-text">CTBC+CRPD</span>。
+        </li>
+    </ol>
+
+    <h3>5. 撥款放行與回報財務</h3>
+    <ol>
+        <li>回到 <code>Transfer approval</code> 的 Transfer Summary List，選擇 <code>Scheduled Settlement Date</code> 為撥款日 (今日) 並搜尋、下載。</li>
+        <li>確認 <code>Total Transfer Amount</code> 的總和相符後，將 Column B~E 的值貼到 <code>Transfer Summary List_yyyymm</code> 的右半部。</li>
+        <li>截圖該表，並在群組通知財務，標記麻煩協助 <code>verify payment @Aimee Lee</code>。</li>
+        <li>等財務回覆 OK 後，再到 <code>Transfer approval > Transfer Summary List > Scheduled Settlement Date</code> 選擇撥款當天，接著點選 <strong>Approve All</strong> 按鈕。</li>
+        <li>按下按鈕後大概 1 個小時，可以回系統查找是否有失敗的情況發生。</li>
+    </ol>
 
 </div>
 
