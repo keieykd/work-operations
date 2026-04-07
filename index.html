@@ -277,7 +277,7 @@
     <h3>二、 清除舊資料前置作業</h3>
     <p>先把「當天的撥款報表」(例如：<code>LINE Pay EPI_Settlement Report_20260331</code>) 這個檔案進行部分清除動作，主要是清除原有的來源資料，不動樞紐的分頁以及公式欄位。刪除的分頁以及內容如下：</p>
     <ul>
-        <li><strong>Mercant Settle Statistics</strong>：刪除 Column A~P, <strong>但保留 Column M</strong> (標頭為 "Verify"，此 column 為公式)。</li>
+        <li><strong>Mercant Settle Statistics</strong>：刪除 Column A~O。</li>
         <li><strong>APAR</strong>：刪除 Column A~AG。</li>
         <li><strong>Refund Reserve</strong>：刪除 Column A~AF。</li>
         <li><strong>Finance IF (Admin JE)</strong>：刪除 Column A~AF。</li>
@@ -343,9 +343,7 @@
 
     <h4>Step 6. 匯入商家統計數據</h4>
     <ol>
-        <li>打開檔案 2 <code>MERCHANT_SETL_STATS</code>，將 Sheet1 從 Column A~L 的所有 rows 複製，貼到模板分頁 <code>Mercant Settle Statistics</code> 的 <strong>Column A~L</strong>。</li>
-        <li>將 Sheet1 從 Column M~O 複製，貼到模板的 <strong>Column N~P</strong>。</li>
-        <li>因為模板的 Column M 增加了一個名為 <code>verfiy</code> 的欄位（自帶公式），貼上後必須將 Column M 每個 rows 都下拉套用到公式。</li>
+        <li>打開檔案 2 <code>MERCHANT_SETL_STATS</code>，將 Sheet1 從 Column A~O 的所有 rows 複製，直接貼到模板分頁 <code>Mercant Settle Statistics</code> 的 <strong>Column A~O</strong>。</li>
     </ol>
 
     <h4>Step 7. 核對餘額與點數 (BALANCE & LINE_POINT)</h4>
@@ -425,6 +423,16 @@
         <li>選擇結帳日當天 (02/27) 以及有差異的 MID (商家名稱) 去搜尋，下載明細查看 row data 結果是否與傳票相符，相符即為正確。</li>
     </ul>
 
+    <h4>Step 12. 發送 EMAIL 報告</h4>
+    <ul>
+        <li>將剛才 Report 分頁的報表截圖貼上 Email，<strong style="color: #d32f2f;">注意：貼上後要把圖拉大，確保數據清晰可見。</strong></li>
+        <li><strong>Email 格式資訊：</strong>
+            <div class="code-text" style="display: block; margin-top: 5px; white-space: pre-wrap;">主旨範例：[LPEPI] [Billing] Report of merchant settlement_2026.04.07
+收件者：TW Pay EPI Finance &lt;dl_twpayepifin@linecorp.com&gt;
+副本：EPI Billing &lt;dl_twepibilling@linecorp.com&gt;</div>
+        </li>
+    </ul>
+
     <hr style="border: 0; border-top: 2px dashed #eee; margin: 40px 0;">
 
     <h2>【第三部分：實際撥款與傳票操作流程】</h2>
@@ -476,14 +484,15 @@
         </p>
         <p><strong>Step E: 系統上執行 Retry</strong><br>
             至 <code>Administrator Function > Settlement Confirm > Transfer approval</code> 下拉到 <strong>Transfer Request List</strong> 執行重送：
-            <br><strong>▶ 狀況1 (退款水位不足)：</strong> Scheduled Settlement Date 一般選擇「前一天撥款日」(依據 MM 檔案為準)，Status 選擇 <code>Insufficient Pool</code>。Search 後點選 <strong>Retry(All)</strong> 或分頁全選 <strong>Retry(selected)</strong>。
+            <br><strong>▶ 狀況1 (退款水位不足)：</strong> Scheduled Settlement Date 一般選擇「前一天撥款日」(依據 MM 檔案為準)，Status 選擇 <code>Insufficient Pool</code>。Search 後，<strong style="color: #d32f2f;">絕對不能點選 Retry(All)</strong>。必須在每一頁勾選清單，然後點選 <strong>Retry(selected)</strong>，逐頁勾選送出。（否則系統會把當天的全送，包含不是「退款水位不足」的情況都會一起送出造成錯誤）。
             <br><strong>▶ 狀況2 (商家資料不齊全)：</strong> 依據 MM 檔案日期搜尋 Scheduled Settlement Date，加上單筆 MID 條件，Status 選擇 <code>Failed</code>。於清單中點擊該項目最右方的 <strong>Retry</strong>。
         </p>
     </div>
 
     <h3>2. 異常排除：傳票傳輸失敗</h3>
     <ol>
-        <li>若傳票(JE)有傳輸失敗，至 <code>Settlement > Finance I/F</code> 搜尋結算當天 Period 及 Sent Status 為 <strong>Fail</strong> 的紀錄查看原因。</li>
+        <li><strong>如何檢查有無異常：</strong>到 <code>Approval of merchant settlement</code> 中 <code>Scheduled Settlement Date</code> 選擇結算日當天，並下載 Download 結果。篩選 <code>Transferred(Y/N)</code> 的結果，<strong>如皆為 N 就是完成了</strong>。</li>
+        <li>若傳票(JE)有傳輸失敗（例如沒有變成 N），至 <code>Settlement > Finance I/F</code> 搜尋結算當天 Period 及 Sent Status 為 <strong>Fail</strong> 的紀錄查看原因。</li>
         <li><strong>常見問題：缺少 vendor code / vendor ID</strong>
             <br>• 用統編向財務申請。至 <code>Merchant Management > Basic information > Merchant inquiry</code> 透過 MID 查統編。
             <br>• 接著至 <code>Settlement > Merchant Settlement data > Merchant Vendor ID I/F</code>，用 MID 搜尋並 Edit 設定 vendor code/vendor ID (預設 Success)。
@@ -563,14 +572,14 @@
                 <br>通知 @Aimee 核准 (<em>"Hi Aimee 剛才有一筆重送 再麻煩核准, 多謝。"</em>)。核准後過濾 Verified 狀態，點選 approve 送出。
                 <br>💡 <strong>特別注意：</strong>若透過 CTBC-CRPD 成功撥款，需發信給 CTBC 確認是否有退匯紀錄 (Subject: <code>[LINE Pay EPI] 退匯交易協助確認_0401</code>)。
             </li>
-            <li><strong>DATA_VALIDATION_ERROR 或 BINDING ERROR：</strong>
-                <br>將撥款方式改為財經。至 <code>Settlement Banking Setup</code> 搜尋是否需 <code>CLOSE</code>，若無則直接設定為 <code>FISC-Exception</code>。
+            <li><strong>當合作銀行出現的錯誤情況與處置：</strong>
+                <br>• <strong>[DATA_VALIDATION_ERROR]：</strong>將撥款方式改為財經。
+                <br>• <strong>[FAILURE]：</strong>不需改設定，稍等再次重送。
+                <br>• <strong>[EXTERNAL_SYSTEM_ERROR]：</strong>先至網銀登入再次查詢驗證，避免重複撥款。確定無撥款紀錄則不需改設定，稍等再次重送。
+                <br>• <strong>[RESTRICT_BANK_ACCOUNT_ERROR]：</strong>將撥款方式改為財經 FISC。
             </li>
             <li><strong>王道銀行 (O-Bank)：</strong>
                 <br>無法撥款給個人商戶(無統編)。若 MID 為個人商戶，直接改為財經 <code>FISC</code>。
-            </li>
-            <li><strong>系統性 External ERROR (合作銀行)：</strong>
-                <br>先至網銀登入再次查詢驗證，避免重複撥款。確定無撥款紀錄則不需改設定，稍等再次重送。
             </li>
         </ol>
 
@@ -588,17 +597,28 @@
         <li>查詢並下載當天最後的 <strong>FAILED</strong> Excel 檔案。</li>
         <li>下載 <strong>Insufficient Pool</strong> 的 Excel 檔案。</li>
         <li>下載 <strong>Paid</strong> 的 Excel 檔案 (資料量較多)。</li>
+        <li><strong>更新 Transfer Summary List 檔案 (優先放入失敗情況)：</strong>
+            <br>打開 <code>Transfer Summary List_yyyymm</code>，將成功 (Paid) 以及上述兩種失敗的情況紀錄上去：
+            <br>• 成功的貼至專屬分頁 <span class="code-text">Transfer Success</span>
+            <br>• 失敗的貼至專屬分頁 <span class="code-text">Failed Transfer_MM</span>
+            <br>• 成功+失敗的合併貼至分頁 <span class="code-text">Transfer Request List(Suc+Fail)</span>
+        </li>
         <li><strong>製作 MM (Merchant Modification Request_EPI) 檔案：</strong>
-            <br>將「退款水位不足」與「商家資料不齊全」的資料填入對應欄位。將下一個工作日(要 Retry 的日期) 先打上。
-            <br>等待中信回覆確認沒有退匯紀錄後，即可將 MM 檔案發信送出。<br>
-            ✉️ 郵件主旨範例：<code>[LPEPI] [Billing] Merchant Modification Request_20260402</code>
+            <br>將剛才整理好的「退款水位不足」與「商家資料不齊全」等失敗資料，分別填入 MM 檔案對應欄位，並將下一個工作日 (要 Retry 的日期) 先打上。
         </li>
-        <li><strong>更新 Transfer Summary List 檔案：</strong>
-            <br>打開 <code>Transfer Summary List_yyyymm</code>，將成功 (Paid) 以及上述兩種失敗的情況紀錄上去。
-            <br>• 成功的貼至專屬分頁
-            <br>• 失敗的貼至專屬分頁
-            <br>• 成功+失敗的貼至各自分頁 (分頁名稱待補充)
+        <li><strong>發送退匯交易確認信與 MM 報表：</strong>
+            <br>發送信件給 CTBC 確認退匯交易。等待中信回覆確認沒有退匯紀錄後，即可將 MM 檔案發信送出。
+            <br>✉️ 郵件主旨範例：<code>[LPEPI] [Billing] Merchant Modification Request_20260402</code>
         </li>
+    </ol>
+
+    <h3>7. 沖帳傳票發送 (Clearing JE Confirm)</h3>
+    <ol>
+        <li>在最後一步驟，確認當日撥款皆已完成，且確認<strong>沒有退匯交易</strong>後，即可執行此動作送出沖帳傳票給財務。</li>
+        <li>至 <code>Transfer approval > Transfer Request List</code> 介面。</li>
+        <li>將 <code>Scheduled Settlement Date</code> 篩選為<strong>撥款日當日</strong>。</li>
+        <li>將 <code>Status</code> 篩選為 <span class="code-text">Paid</span>，然後點選 <strong>Search</strong>。</li>
+        <li>確認清單無誤後，點選頁面上的 <strong>Clearing JE confirm</strong> 按鈕送出。</li>
     </ol>
 
 </div>
