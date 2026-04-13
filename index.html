@@ -439,13 +439,7 @@
 
     <h3>1. 結算核准與傳票發送 (Approval & Journal)</h3>
     <ol>
-        <li>進入路徑：<code>Administrator Function > Settlement Confirm > Approval of merchant settlement</code>。</li>
-        <li><strong>設定搜尋條件：</strong>
-            <br>• Scheduled Settlement Date：選擇結算日到往後兩個月 (例如 03/31 到 05/31)
-            <br>• Aggregation Date：選擇結算當天 (例如 03/31)
-        </li>
-        <li>點選 Search 後，點選 <strong>Bulk Download</strong> 按鈕（<strong>勾選 Delete previous aggregated file</strong>）。</li>
-        <li>至 <code>Bulk Data Download</code> 下載 Excel，檔名為 <code>MERCHANT_SETL_AGRN_BASE_...</code> 開頭。</li>
+        <li>打開傳票檔名為 <code>MERCHANT_SETL_AGRN_BASE_...</code> 開頭。</li>
         <li><strong>打開檔案進行篩選核對：</strong>
             <br>① <code>NEON Fees Field</code> 非空白 (勾選有值)
             <br>② <code>Transferred(Y/N)</code> 選擇 <span class="code-text">Y</span>
@@ -509,7 +503,7 @@
             👉 <strong>若不一致：</strong>稍等片刻再重新下載。
         </li>
         <li><strong>若一致，進行非合作銀行 (FISC-Exception) 批量設定：</strong><br>
-            篩選 Bank Type 為 <code>COOPERATIVE_BANK</code>，檢查銀行名稱是否包含「台新國際商業銀行」或「合作金庫商業銀行」或「高雄銀行」。若有，將 MID 複製至 txt 檔。<br>
+            篩選 Bank Type 為 <code>COOPERATIVE_BANK</code>，檢查銀行名稱是否包含「台新國際商業銀行」或「合作金庫商業銀行」。若有，將 MID 複製至 txt 檔。<br>
             前往 <code>Operation Menu > Settlement Master Data > Settlement Banking Setup</code>，點選 <strong>Register(Bulk)</strong>，Settlement Banking System 選擇 <code>FISC-Exception</code> 並上傳 txt 檔。
         </li>
         <li><strong>進行非合作銀行大額 (CTBC+CRPD) 個別設定：</strong><br>
