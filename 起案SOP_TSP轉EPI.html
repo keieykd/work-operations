@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>起案 SOP (TSP 將點數轉到 EPI)</title>
+    <style>
+        :root {
+            /* 莫蘭迪色系 (Morandi Palette) - 底色不變 */
+            --bg-color: #E8EAE6;        
+            --card-bg: #F7F7F6;         
+            
+            /* 【文字顏色大幅加深】保證清晰！ */
+            --text-main: #1A1C1B;       /* 極深灰，幾乎是黑色 */
+            --text-muted: #3B3F3E;      /* 次要文字也加深 */
+            
+            --primary-color: #839788;   
+            --primary-dark: #4A574E;    /* 主題深色也加深 */
+            --primary-light: #C2CEC5;
+            
+            --info-color: #3B536B;      /* 連結顏色加深 */
+            --info-bg: #DEE3E8;
+            
+            --warning-color: #9E3E3E;   /* 警告顏色加深更醒目 */
+            
+            --border-color: #C0C4C0;
+            --code-bg: #DCE0DA;
+            --code-text: #6B2E45;       
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Helvetica Neue', 'Microsoft JhengHei', Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-size: 18px; 
+            line-height: 1.7;
+            padding: 40px 20px; 
+        }
+
+        .container {
+            max-width: 900px; 
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 50px;
+            padding: 40px 30px;
+            background: var(--primary-color);
+            color: #FFFFFF;
+            border-radius: 16px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.2); /* 增加標題清晰度 */
+        }
+
+        header h1 {
+            font-size: 2rem;
+            margin-bottom: 12px;
+            font-weight: 700; /* 加粗 */
+            letter-spacing: 1px;
+        }
+
+        header p {
+            font-size: 1.15rem;
+            font-weight: 500;
+        }
+
+        .sop-step {
+            background: var(--card-bg);
+            margin-bottom: 24px;
+            border-radius: 16px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+            padding: 30px;
+            border-left: 6px solid var(--primary-color);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            display: grid;
+            grid-template-columns: 50px 1fr;
+            gap: 25px;
+            align-items: start;
+        }
+
+        .sop-step:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+        }
+
+        .step-zero {
+            border-left: 6px solid var(--info-color);
+        }
+        
+        .step-zero .step-number {
+            background-color: var(--info-bg);
+            color: var(--info-color);
+            border: 2px solid #A4B2C0;
+        }
+
+        .step-number {
+            width: 50px;
+            height: 50px;
+            background-color: var(--primary-dark);
+            color: #FFFFFF;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            font-weight: bold;
+        }
+
+        .step-content {
+            padding-top: 5px; 
+        }
+
+        .step-content h3 {
+            font-size: 1.25rem;
+            margin-bottom: 10px;
+            color: var(--text-main);
+            font-weight: 700; /* 加粗 */
+        }
+
+        .step-content p {
+            color: var(--text-muted);
+            font-size: 1.05rem;
+            font-weight: 500; /* 微調字重讓文字更紮實 */
+        }
+        
+        .step-content a {
+            color: var(--info-color);
+            text-decoration: none;
+            word-break: break-all;
+            border-bottom: 1px solid var(--info-color);
+            font-weight: 600;
+        }
+        
+        .step-content a:hover {
+            color: #1A2836;
+            border-bottom: 2px solid #1A2836;
+        }
+
+        code, .highlight {
+            background-color: var(--code-bg);
+            color: var(--code-text);
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.95em;
+            font-weight: 700;
+        }
+
+        .btn-style {
+            background-color: #FFFFFF;
+            border: 1px solid #999;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.95em;
+            font-weight: 700;
+            color: #111;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .warning {
+            color: var(--warning-color);
+            font-weight: 700;
+            font-size: 0.95em;
+            margin-left: 8px;
+            background-color: #F8EAEA;
+            padding: 2px 8px;
+            border-radius: 4px;
+            border: 1px solid #E5C3C3;
+        }
+
+        .sub-steps {
+            background: #FFFFFF;
+            border: 1px solid var(--border-color);
+            padding: 20px 25px;
+            border-radius: 12px;
+            margin-top: 15px;
+            font-size: 1rem;
+            color: var(--text-main); /* 子步驟也用深色 */
+            font-weight: 500;
+        }
+
+        .sub-steps ul {
+            padding-left: 20px;
+        }
+
+        .sub-steps li {
+            margin-bottom: 8px;
+        }
+
+        .copy-block {
+            background-color: #242625; 
+            color: #F0F2F0;
+            padding: 16px 20px;
+            border-radius: 10px;
+            margin-top: 15px;
+            font-family: 'Courier New', Courier, monospace;
+            white-space: pre-wrap;
+            font-size: 1.05rem;
+            line-height: 1.5;
+            border-left: 4px solid var(--primary-light);
+            font-weight: 600;
+        }
+
+        @media (max-width: 768px) {
+            body { padding: 20px 15px; }
+            .sop-step {
+                grid-template-columns: 1fr; 
+                gap: 15px;
+                padding: 25px 20px;
+            }
+            .step-number { margin-bottom: 5px; }
+            header h1 { font-size: 1.6rem; }
+            header { padding: 30px 20px; margin-bottom: 30px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>起案 SOP</h1>
+        <p>針對 TSP 將點數轉到 EPI 的標準作業流程</p>
+    </header>
+
+    <main>
+        <div class="sop-step step-zero">
+            <div class="step-number">0</div>
+            <div class="step-content">
+                <h3>事前參考</h3>
+                <p>可以參考之前的資訊，參考網址：<br>
+                <a href="https://lime-ess.workers-hub.com/nfi/ForeignPaymentDraft.nhn?aprvId=AP26039006185" target="_blank">https://lime-ess.workers-hub.com/nfi/ForeignPaymentDraft.nhn?aprvId=AP26039006185</a></p>
+            </div>
+        </div>
+
+        <div class="sop-step">
+            <div class="step-number">1</div>
+            <div class="step-content">
+                <h3>登入 APMS 系統</h3>
+                <p>前往網址：<a href="https://apms.workers-hub.com/app/apprvList/process/treat" target="_blank">https://apms.workers-hub.com/app/apprvList/process/treat</a> <span class="warning">⚠️ 注意：請勿使用 VPN</span></p>
+            </div>
+        </div>
+
+        <div class="sop-step">
+            <div class="step-number">2</div>
+            <div class="step-content">
+                <h3>建立表單</h3>
+                <p>點選頁面上的 <span class="btn-style">View custom format</span> 按鈕，接著點選清單中的 <span class="btn-style">Budget Execution Report (LPTW)</span> 來建立表單。</p>
+            </div>
+        </div>
+
+        <div class="sop-step">
+            <div class="step-number">3</div>
+            <div class="step-content">
+                <h3>搜尋 Draft No.</h3>
+                <p>在第一步的 Draft No. 欄位搜尋 <code>2026-LPTW-C400-06323</code>。<br>
+                <span style="font-size: 0.9em; color: var(--primary-dark); font-weight: bold;">※ 提示：日期需往前選幾天才會查到結果。</span></p>
+            </div>
+        </div>
+
+        <div class="sop-step">
+            <div class="step-number">4</div>
+            <div class="step-content">
+                <h3>展開欄位</h3>
+                <p>點選 <span class="btn-style">Settlement</span> 按鈕以展開下方詳細欄位。</p>
+            </div>
+        </div>
+
+        <div class="sop-step">
+            <div class="step-number">5</div>
+            <div class="step-content">
+                <h3>填寫銀行帳號</h3>
+                <p>銀行帳號請選擇：<span class="highlight">624542582789 連加電子支付股份有限公司</span></p>
+            </div>
+        </div>
+
+        <div class="sop-step">
+            <div class="step-number">6</div>
+            <div class="step-content">
+                <h3>設定 Invoice Date</h3>
+                <p>Invoice Date 請選擇與「紙本」上相同的 <strong>Issue Date</strong>。</p>
+            </div>
+        </div>
+
+        <div class="sop-step">
+            <div class="step-number">7</div>
+            <div class="step-content">
+                <h3>設定 Invoice Type</h3>
+                <p>Invoice Type 請直接選擇 <strong>Invoice</strong>。</p>
+            </div>
+        </div>
+
+        <div class="sop-step">
+            <div class="step-number">8</div>
+            <div class="step-content">
+                <h3>上傳附件 (Attachment - Invoice)</h3>
+                <p>選擇掃描好的 PDF 檔案。若尚未掃描，請依以下步驟操作印表機：</p>
+                <div class="sub-steps">
+                    <ul>
+                        <li>先到印表機「逼」員工證登入。</li>
+                        <li>選擇畫面上右上角的 <strong>傳輸</strong> 按鈕。</li>
+                        <li>將紙本內容 <strong>朝上</strong> 放入上方自動饋紙槽。</li>
+                        <li>等待掃描，完成時會聽到一聲提示音。</li>
+                        <li>將紙本拿掉，並在螢幕點選 <strong>登出</strong>。</li>
+                        <li>檔案最後會寄送到您的個人 EMAIL 信箱。</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="sop-step">
+            <div class="step-number">9</div>
+            <div class="step-content">
+                <h3>填寫金額</h3>
+                <p>在 <strong>Supply Value</strong> 填上紙本上的「總額」，其他欄位請保持空白。</p>
+            </div>
+        </div>
+
+        <div class="sop-step">
+            <div class="step-number">10</div>
+            <div class="step-content">
+                <h3>填寫表單 Title (第三步)</h3>
+                <p>Title 填寫格式如下 (最後的月份請根據實際狀況調整)：</p>
+                <div class="copy-block">[LPTW FIN] [Billing] LINE Points for LINE Pay EPI Company-202603</div>
+            </div>
+        </div>
+
+        <div class="sop-step">
+            <div class="step-number">11</div>
+            <div class="step-content">
+                <h3>填寫 Description</h3>
+                <p>Description 內容第一行請貼上以下文字：</p>
+                <div class="copy-block">The amount of LINE Points deducted when users pay with EPI payment method is paid to the merchant by EPI company on behalf of the TSP company.</div>
+                <p style="margin-top: 15px;">接著在下方貼上 Jennifer 提供的表格，請確認表格需包含以下表頭：<br>
+                <code>Period</code> | <code>Points Amount</code> | <code>Receipt Amount</code> | <code>Issue Date</code></p>
+            </div>
+        </div>
+
+        <div class="sop-step">
+            <div class="step-number">12</div>
+            <div class="step-content">
+                <h3>設定 Approver (第四步)</h3>
+                <p>點選 <span class="btn-style">Add Approver</span> 按鈕，將 <strong>Erato</strong> 加進來，並且將其順序拖拉到最上方。</p>
+            </div>
+        </div>
+
+        <div class="sop-step">
+            <div class="step-number">13</div>
+            <div class="step-content">
+                <h3>送出並通知</h3>
+                <p>最後點選 <span class="btn-style">Submit</span> 送出表單，並請通知 <strong>Erato</strong> 進行 Approve。</p>
+            </div>
+        </div>
+    </main>
+</div>
+
+</body>
+</html>
