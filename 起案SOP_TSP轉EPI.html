@@ -219,6 +219,37 @@
             header h1 { font-size: 1.6rem; }
             header { padding: 30px 20px; margin-bottom: 30px; }
         }
+
+        /* =========================================
+           列印與 PDF 輸出專用設定 (Print Styles)
+           ========================================= */
+        @media print {
+            body {
+                background-color: #FFFFFF; /* 將最外層底色轉為純白，PDF 邊界更乾淨 */
+                padding: 0;
+            }
+            .container {
+                max-width: 100%;
+                margin: 0;
+            }
+            .sop-step {
+                box-shadow: none !important; /* PDF 不需要陰影 */
+                border: 1px solid var(--border-color); /* 改用細緻實線框取代陰影 */
+                page-break-inside: avoid; /* 🌟 關鍵：避免單一步驟被硬生生切成兩頁 */
+                break-inside: avoid;
+                margin-bottom: 20px;
+            }
+            header {
+                box-shadow: none !important;
+                -webkit-print-color-adjust: exact; /* 強制印出背景色 */
+                print-color-adjust: exact;
+            }
+            /* 讓按鈕樣式在印出時更平整 */
+            .btn-style {
+                border: 1px solid #999;
+                background-color: #F8F9FA;
+            }
+        }
     </style>
 </head>
 <body>
